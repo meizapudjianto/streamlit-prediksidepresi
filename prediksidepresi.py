@@ -47,17 +47,17 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 
 # Sidebar menu
 st.sidebar.title("Prediksi Tingkat Depresi")
-menu = st.sidebar.selectbox("Pilih Menu", ["Regresi Linier Berganda", "Random Forest", "Gradient Boosting"])
+menu = st.sidebar.selectbox("Pilih Menu", ["Multiple Linear Regression", "Random Forest Regressor", "Gradient Boosting Regression"])
 
 # Model selection
-if menu == "Regresi Linier Berganda":
-    st.title("Regresi Linier Berganda")
+if menu == "Multiple Linear Regression":
+    st.title("Multiple Linear Regression")
     model = LinearRegression()
-elif menu == "Random Forest":
-    st.title("Random Forest")
+elif menu == "Random Forest Regressor":
+    st.title("Random Forest Regressor")
     model = RandomForestRegressor(n_estimators=100, random_state=0)
-elif menu == "Gradient Boosting":
-    st.title("Gradient Boosting")
+elif menu == "Gradient Boosting Regression":
+    st.title("Gradient Boosting Regression")
     model = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=0)
 
 # Train and evaluate model
