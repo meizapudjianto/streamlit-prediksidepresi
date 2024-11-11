@@ -7,13 +7,13 @@ from sklearn.ensemble import RandomForestRegressor, GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import plotly.express as px
 
-# Load data function
+# Memuat fungsi data
 @st.cache_data
 def load_data():
     data = pd.read_csv("responden_bersih.csv")  # Ensure this is your cleaned data file
     return data
 
-# Function to categorize depression levels
+# Fungsi untuk mengkategorikan tingkat depresi
 def kategori_depresi(skor):
     if skor <= 9:
         return 'Normal'
@@ -26,7 +26,7 @@ def kategori_depresi(skor):
     else:
         return 'Sangat Parah'
 
-# Train and evaluate model function
+# Melatih dan mengevaluasi fungsi model
 def train_and_evaluate_model(model, X_train, X_test, y_train, y_test):
     model.fit(X_train, y_train)
     y_pred = model.predict(X_test)
@@ -36,20 +36,20 @@ def train_and_evaluate_model(model, X_train, X_test, y_train, y_test):
     }
     return y_pred, evaluation
 
-# Load data
+# Muat data
 data = load_data()
 data['kategori_depresi'] = data['skor_depresi'].apply(kategori_depresi)
 
-# Set up training data
+# Menyiapkan data pelatihan
 X = data[['skor_stres', 'skor_kecemasan']]
 y = data['skor_depresi']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=0)
 
-# Sidebar menu
+# Menu Sidebar
 st.sidebar.title("Prediksi Tingkat Depresi")
 menu = st.sidebar.selectbox("Pilih Menu", ["Multiple Linear Regression", "Random Forest Regressor", "Gradient Boosting Regression"])
 
-# Model selection
+# Pemilihan model
 if menu == "Multiple Linear Regression":
     st.title("Multiple Linear Regression")
     model = LinearRegression()
@@ -60,19 +60,19 @@ elif menu == "Gradient Boosting Regression":
     st.title("Gradient Boosting Regression")
     model = GradientBoostingRegressor(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=0)
 
-# Train and evaluate model
+# Melatih dan mengevaluasi model
 y_pred, evaluation = train_and_evaluate_model(model, X_train, X_test, y_train, y_test)
 y_pred_categories = pd.Series([kategori_depresi(score) for score in y_pred], index=y_test.index)
 
-# Display evaluation metrics
+# Menampilkan metrik evaluasi
 st.subheader("Hasil Evaluasi")
 st.write("Mean Absolute Error (MAE):", evaluation["MAE"])
 st.write("Root Mean Squared Error (RMSE):", evaluation["RMSE"])
 
-# Define the desired category order
+# Menentukan urutan kategori yang diinginkan
 category_order = ["Normal", "Ringan", "Sedang", "Parah", "Sangat Parah"]
 
-# Plot distribution of actual vs predicted data
+# Plot distribusi data aktual vs prediksi
 st.subheader("Distribusi Kategori Depresi")
 col1, col2 = st.columns(2)
 
@@ -102,11 +102,11 @@ with col2:
     )
     st.plotly_chart(bar_chart_pred)
 
-# Prepare data for actual vs predicted comparison by demographics
-# Actual data grouped by demographic information
+# Mempersiapkan data untuk perbandingan aktual vs prediksi berdasarkan demografi
+# Data aktual yang dikelompokkan berdasarkan informasi demografis
 data['kategori_depresi'] = pd.Categorical(data['kategori_depresi'], categories=category_order, ordered=True)
 
-# For each demographic factor: angkatan, jenis_kelamin, tinggal_dengan_keluarga
+# Untuk setiap faktor demografis: angkatan, jenis_kelamin, tinggal_dengan_keluarga
 for factor in ["angkatan", "jenis_kelamin", "tinggal_dengan_keluarga"]:
     st.subheader(f"Distribusi Kategori Depresi Berdasarkan {factor.capitalize()}")
     actual_grouped = data.groupby([factor, 'kategori_depresi']).size().reset_index(name='jumlah')
@@ -124,7 +124,7 @@ for factor in ["angkatan", "jenis_kelamin", "tinggal_dengan_keluarga"]:
     )
     st.plotly_chart(bar_chart_actual)
 
-    # Predicted data grouped by demographic information
+    # Prediksi data yang dikelompokkan berdasarkan informasi demografis
     predicted_data = X_test.copy()
     predicted_data['kategori_prediksi'] = y_pred_categories
     predicted_data[factor] = data[factor].iloc[y_test.index].values
